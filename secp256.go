@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be found in
 // the LICENSE file.
 
+//go:build !gofuzz || cgo
 // +build !gofuzz cgo
 
 // Package secp256k1 wraps the bitcoin secp256k1 C library.
@@ -73,9 +74,9 @@ func init() {
 
 func initContext() *C.secp256k1_context {
 	// around 20 ms on a modern CPU.
-	ctx := C.secp256k1_context_create_sign_verify()
-	C.secp256k1_context_set_illegal_callback(ctx, C.callbackFunc(C.secp256k1GoPanicIllegal), nil)
-	C.secp256k1_context_set_error_callback(ctx, C.callbackFunc(C.secp256k1GoPanicError), nil)
+	ctx := C.erigon_secp256k1_context_create_sign_verify()
+	C.erigon_secp256k1_context_set_illegal_callback(ctx, C.callbackFunc(C.secp256k1GoPanicIllegal), nil)
+	C.erigon_secp256k1_context_set_error_callback(ctx, C.callbackFunc(C.secp256k1GoPanicError), nil)
 	return ctx
 }
 
@@ -116,16 +117,16 @@ func Sign(msg []byte, seckey []byte) ([]byte, error) {
 		return nil, ErrInvalidKey
 	}
 	seckeydata := (*C.uchar)(unsafe.Pointer(&seckey[0]))
-	if C.secp256k1_ec_seckey_verify(context, seckeydata) != 1 {
+	if C.erigon_secp256k1_ec_seckey_verify(context, seckeydata) != 1 {
 		return nil, ErrInvalidKey
 	}
 
 	var (
 		msgdata   = (*C.uchar)(unsafe.Pointer(&msg[0]))
-		noncefunc = C.secp256k1_nonce_function_rfc6979
-		sigstruct C.secp256k1_ecdsa_recoverable_signature
+		noncefunc = C.erigon_secp256k1_nonce_function_rfc6979
+		sigstruct C.erigon_secp256k1_ecdsa_recoverable_signature
 	)
-	if C.secp256k1_ecdsa_sign_recoverable(context, &sigstruct, msgdata, seckeydata, noncefunc, nil) == 0 {
+	if C.erigon_secp256k1_ecdsa_sign_recoverable(context, &sigstruct, msgdata, seckeydata, noncefunc, nil) == 0 {
 		return nil, ErrSignFailed
 	}
 
@@ -134,7 +135,7 @@ func Sign(msg []byte, seckey []byte) ([]byte, error) {
 		sigdata = (*C.uchar)(unsafe.Pointer(&sig[0]))
 		recid   C.int
 	)
-	C.secp256k1_ecdsa_recoverable_signature_serialize_compact(context, sigdata, &recid, &sigstruct)
+	C.erigon_erigon_secp256k1_ecdsa_recoverable_signature_serialize_compact(context, sigdata, &recid, &sigstruct)
 	sig[64] = byte(recid) // add back recid to get 65 bytes sig
 	return sig, nil
 }

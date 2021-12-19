@@ -14,7 +14,7 @@
 
 int main(void) {
     secp256k1_context* ctx;
-    secp256k1_ecdsa_signature signature;
+    erigon_secp256k1_ecdsa_signature signature;
     secp256k1_pubkey pubkey;
     size_t siglen = 74;
     size_t outputlen = 33;
@@ -41,23 +41,23 @@ int main(void) {
         msg[i] = i + 1;
     }
 
-    ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_DECLASSIFY);
+    ctx = erigon_secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_DECLASSIFY);
 
     /* Test keygen. */
     VALGRIND_MAKE_MEM_UNDEFINED(key, 32);
-    ret = secp256k1_ec_pubkey_create(ctx, &pubkey, key);
+    ret = erigon_secp256k1_ec_pubkey_create(ctx, &pubkey, key);
     VALGRIND_MAKE_MEM_DEFINED(&pubkey, sizeof(secp256k1_pubkey));
     VALGRIND_MAKE_MEM_DEFINED(&ret, sizeof(ret));
     CHECK(ret);
-    CHECK(secp256k1_ec_pubkey_serialize(ctx, spubkey, &outputlen, &pubkey, SECP256K1_EC_COMPRESSED) == 1);
+    CHECK(erigon_secp256k1_ec_pubkey_serialize(ctx, spubkey, &outputlen, &pubkey, SECP256K1_EC_COMPRESSED) == 1);
 
     /* Test signing. */
     VALGRIND_MAKE_MEM_UNDEFINED(key, 32);
-    ret = secp256k1_ecdsa_sign(ctx, &signature, msg, key, NULL, NULL);
-    VALGRIND_MAKE_MEM_DEFINED(&signature, sizeof(secp256k1_ecdsa_signature));
+    ret = erigon_secp256k1_ecdsa_sign(ctx, &signature, msg, key, NULL, NULL);
+    VALGRIND_MAKE_MEM_DEFINED(&signature, sizeof(erigon_secp256k1_ecdsa_signature));
     VALGRIND_MAKE_MEM_DEFINED(&ret, sizeof(ret));
     CHECK(ret);
-    CHECK(secp256k1_ecdsa_signature_serialize_der(ctx, sig, &siglen, &signature));
+    CHECK(erigon_erigon_erigon_secp256k1_ecdsa_signature_serialize_der(ctx, sig, &siglen, &signature));
 
 #if ENABLE_MODULE_ECDH
     /* Test ECDH. */
@@ -68,7 +68,7 @@ int main(void) {
 #endif
 
     VALGRIND_MAKE_MEM_UNDEFINED(key, 32);
-    ret = secp256k1_ec_seckey_verify(ctx, key);
+    ret = erigon_secp256k1_ec_seckey_verify(ctx, key);
     VALGRIND_MAKE_MEM_DEFINED(&ret, sizeof(ret));
     CHECK(ret == 1);
 
@@ -91,10 +91,10 @@ int main(void) {
 
     /* Test context randomisation. Do this last because it leaves the context tainted. */
     VALGRIND_MAKE_MEM_UNDEFINED(key, 32);
-    ret = secp256k1_context_randomize(ctx, key);
+    ret = erigon_secp256k1_context_randomize(ctx, key);
     VALGRIND_MAKE_MEM_DEFINED(&ret, sizeof(ret));
     CHECK(ret);
 
-    secp256k1_context_destroy(ctx);
+    erigon_secp256k1_context_destroy(ctx);
     return 0;
 }

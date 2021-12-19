@@ -24,10 +24,10 @@ void bench_recover(void* arg, int iters) {
     for (i = 0; i < iters; i++) {
         int j;
         size_t pubkeylen = 33;
-        secp256k1_ecdsa_recoverable_signature sig;
-        CHECK(secp256k1_ecdsa_recoverable_signature_parse_compact(data->ctx, &sig, data->sig, i % 2));
-        CHECK(secp256k1_ecdsa_recover(data->ctx, &pubkey, &sig, data->msg));
-        CHECK(secp256k1_ec_pubkey_serialize(data->ctx, pubkeyc, &pubkeylen, &pubkey, SECP256K1_EC_COMPRESSED));
+        erigon_secp256k1_ecdsa_recoverable_signature sig;
+        CHECK(erigon_erigon_secp256k1_ecdsa_recoverable_signature_parse_compact(data->ctx, &sig, data->sig, i % 2));
+        CHECK(erigon_secp256k1_ecdsa_recover(data->ctx, &pubkey, &sig, data->msg));
+        CHECK(erigon_secp256k1_ec_pubkey_serialize(data->ctx, pubkeyc, &pubkeylen, &pubkey, SECP256K1_EC_COMPRESSED));
         for (j = 0; j < 32; j++) {
             data->sig[j + 32] = data->msg[j];    /* Move former message to S. */
             data->msg[j] = data->sig[j];         /* Move former R to message. */
@@ -53,10 +53,10 @@ int main(void) {
 
     int iters = get_iters(20000);
 
-    data.ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+    data.ctx = erigon_secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
 
     run_benchmark("ecdsa_recover", bench_recover, bench_recover_setup, NULL, &data, 10, iters);
 
-    secp256k1_context_destroy(data.ctx);
+    erigon_secp256k1_context_destroy(data.ctx);
     return 0;
 }

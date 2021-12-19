@@ -31,7 +31,7 @@ static void bench_ecdh_setup(void* arg) {
     for (i = 0; i < 32; i++) {
         data->scalar[i] = i + 1;
     }
-    CHECK(secp256k1_ec_pubkey_parse(data->ctx, &data->point, point, sizeof(point)) == 1);
+    CHECK(erigon_secp256k1_ec_pubkey_parse(data->ctx, &data->point, point, sizeof(point)) == 1);
 }
 
 static void bench_ecdh(void* arg, int iters) {
@@ -50,10 +50,10 @@ int main(void) {
     int iters = get_iters(20000);
 
     /* create a context with no capabilities */
-    data.ctx = secp256k1_context_create(SECP256K1_FLAGS_TYPE_CONTEXT);
+    data.ctx = erigon_secp256k1_context_create(SECP256K1_FLAGS_TYPE_CONTEXT);
 
     run_benchmark("ecdh", bench_ecdh, bench_ecdh_setup, NULL, &data, 10, iters);
 
-    secp256k1_context_destroy(data.ctx);
+    erigon_secp256k1_context_destroy(data.ctx);
     return 0;
 }

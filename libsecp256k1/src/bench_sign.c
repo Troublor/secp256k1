@@ -34,9 +34,9 @@ static void bench_sign_run(void* arg, int iters) {
     for (i = 0; i < iters; i++) {
         size_t siglen = 74;
         int j;
-        secp256k1_ecdsa_signature signature;
-        CHECK(secp256k1_ecdsa_sign(data->ctx, &signature, data->msg, data->key, NULL, NULL));
-        CHECK(secp256k1_ecdsa_signature_serialize_der(data->ctx, sig, &siglen, &signature));
+        erigon_secp256k1_ecdsa_signature signature;
+        CHECK(erigon_secp256k1_ecdsa_sign(data->ctx, &signature, data->msg, data->key, NULL, NULL));
+        CHECK(erigon_erigon_secp256k1_ecdsa_signature_serialize_der(data->ctx, sig, &siglen, &signature));
         for (j = 0; j < 32; j++) {
             data->msg[j] = sig[j];
             data->key[j] = sig[j + 32];
@@ -49,10 +49,10 @@ int main(void) {
 
     int iters = get_iters(20000);
 
-    data.ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+    data.ctx = erigon_secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
 
     run_benchmark("ecdsa_sign", bench_sign_run, bench_sign_setup, NULL, &data, 10, iters);
 
-    secp256k1_context_destroy(data.ctx);
+    erigon_secp256k1_context_destroy(data.ctx);
     return 0;
 }
